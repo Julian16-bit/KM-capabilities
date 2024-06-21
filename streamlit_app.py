@@ -157,11 +157,12 @@ def check_conflicts(doc_pair):
                return None
     
 if st.button("Submit"):
-    df_descriptives = td.extract_metrics(text=text, spacy_model="en_core_web_lg", metrics=["descriptive_stats", "readability","dependency_distance","coherence"])
-    df_descriptives_brief = df_descriptives[['gunning_fog', 'flesch_kincaid_grade', 'sentence_length_mean']]
-    st.write(" ")
     with st.expander("Readability Metrics"):
         st.write('Original Text Metrics')
+      
+        df_descriptives = td.extract_metrics(text=text, spacy_model="en_core_web_lg", metrics=["descriptive_stats", "readability","dependency_distance","coherence"])
+        df_descriptives_brief = df_descriptives[['gunning_fog', 'flesch_kincaid_grade', 'sentence_length_mean']]
+        st.write(" ")
         st.dataframe(df_descriptives_brief)
 
         #rewrite text in simplified form
