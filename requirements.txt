@@ -10,3 +10,4 @@ spacy
 wordcloud
 scikit-learn
 joblib
+python -m spacy download en_core_web_sm
