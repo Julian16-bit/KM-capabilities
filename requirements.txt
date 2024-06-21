@@ -4,3 +4,8 @@ textdescriptives
 openai
 sentence_transformers
 weaviate-client
+matplotlib
+keybert
+spacy
+wordcloud
+scikit-learn
