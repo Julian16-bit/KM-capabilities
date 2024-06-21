@@ -3,3 +3,4 @@ pandas
 textdescriptives
 openai
 sentence_transformers
+weaviate-client
