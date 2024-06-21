@@ -19,7 +19,7 @@ st.markdown("<h1 style='text-align: center; margin-bottom: 20px'>AI Capabilities
 text = st.text_area("Enter some text here:", height=150, label_visibility="collapsed", placeholder="Enter your text here 📝")
 
 with st.sidebar:
-    api_token = st.text_input("Enter your OAI key:", type='password')
+  api_token = st.text_input("Enter your OpenAI key:", type='password')
     
 gpt = OpenAI(api_key=api_token)
 
