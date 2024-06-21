@@ -6,6 +6,12 @@ from sentence_transformers import CrossEncoder, util, SentenceTransformer
 import numpy as np
 import weaviate
 import json
+import spacy
+import joblib
+import matplotlib.pyplot as plt
+from keybert import KeyBERT
+from sklearn.cluster import KMeans
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
 auth_config = weaviate.AuthApiKey(api_key="MutVi6yIYXH5xsoUlxhDH0O4GwO1aBCe1Jz0")
 
@@ -22,11 +28,46 @@ with st.sidebar:
   api_token = st.text_input("Enter your OpenAI key:", type='password')
     
 gpt = OpenAI(api_key=api_token)
+kw_model = KeyBERT("all-MiniLM-L6-v2")
+kmeans = joblib.load('kmeans.joblib')
+spacy_model = spacy.load('en_core_web_sm')
+vect_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+reranker_model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+
+df = pd.read_json("keywords.json", orient= "records", lines=True)
+df = df[["label", "keywords", "section_number"]]
+df = df.sort_values(by=['label'])
+nb_clusters = len(df["label"].unique())
+
+detailed_cluster_keywords = [[] for _ in range(nb_clusters)]
+word_cloud_list = [[] for _ in range(nb_clusters)]
+cluster_sections = [[] for _ in range(nb_clusters)]
+keywords = []
+counts = []
+for label in range(nb_clusters):
+  cluster_keywords = []
+  cluster_keywords_counts = []
+  for idx in df[df['label'] == label].index:
+      if type(df.loc[idx, "keywords"]) == float:
+        continue
+      cluster_sections[label].append(df.loc[idx, "section_number"].split('.')[0])
+      for kw in df.loc[idx, "keywords"].split(','):
+        if kw not in cluster_keywords:
+          cluster_keywords.append(kw)
+          cluster_keywords_counts.append(1)
+        else:
+          cluster_keywords_counts[cluster_keywords.index(kw)] += 1
+  word_cloud_list[label] =  dict(zip(cluster_keywords, cluster_keywords_counts))
+  for idx in range(len(cluster_keywords)):
+    if cluster_keywords_counts[idx] >  (len(df[df['label'] == label])//2):
+      detailed_cluster_keywords[label].append(cluster_keywords[idx])
+      if cluster_keywords[idx] not in keywords:
+        keywords.append(cluster_keywords[idx])
+        counts.append(cluster_keywords_counts[idx])
+      else:
+        counts[keywords.index(cluster_keywords[idx])] += cluster_keywords_counts[idx]
 
 def top_results(text):
-  model_name = 'sentence-transformers/all-MiniLM-L6-v2'
-  vect_model = SentenceTransformer(model_name)
-  reranker_model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
   query_embedding = vect_model.encode(text)
   response = (
   client.query
@@ -154,8 +195,15 @@ def check_conflicts(doc_pair):
               print(completion)
               return completion.choices[0].message.content
             else:
-               return None
+              return None
     
+def get_cluster(new_doc):
+  kws = [kw[0] for kw in kw_model.extract_keywords(new_doc, keyphrase_ngram_range=(1,1), top_n =6, use_mmr=True, diversity=0.6)]
+  kws = [' '.join([token.lemma_ for token in spacy_model(kw)])  for kw in kws]
+  new_doc = vect_model.encode(new_doc)
+  res = kmeans.predict(np.array([new_doc]))
+  return res, kws
+
 if st.button("Submit"):
     with st.expander("Readability Metrics"):
         st.write('Original Text Metrics')
@@ -213,11 +261,12 @@ if st.button("Submit"):
         for i in range(len(res)):
             pair = res[i]
             conflict = check_conflicts(pair)
-            if conflict: 
+            if conflict != None: 
                 section = {
                     'texts': res[i],
                     'files': idx[i],
                     'conflict': conflict,
+                    'explanation': conflict
                 }
                 full_docs.append(section)
                 full_docs_df = pd.DataFrame(full_docs)
@@ -226,7 +275,7 @@ if st.button("Submit"):
         st.write(" ")
     
         st.write('**Contradicting Texts**')
-        if full_docs:
+        if len(full_docs) > 0:
             st.table(full_docs_df)
         else:
             st.write('No contradictions found')
@@ -234,6 +283,16 @@ if st.button("Submit"):
     st.write(" ")
 
     with st.expander("Cluster Details"):
-        st.write('hello')
-    with st.expander("Cluster Details"):
-        st.write('hello')
+        cluster,kw = get_cluster(text)
+        st.write('**Clustering Result: **')
+        st.write(cluster[0])
+        st.write('**Keywords in Document**')
+        st.write(kw)
+        st.write('**Cluster Wordcloud**')
+        wordcloud = WordCloud(max_font_size=50, max_words=100, background_color="white").generate_from_frequencies(word_cloud_list[int(cluster[0])])
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis("off")
+        plt.show()
+        st.set_option('deprecation.showPyplotGlobalUse', False)
+        st.pyplot()
+
