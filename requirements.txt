@@ -9,3 +9,4 @@ keybert
 spacy
 wordcloud
 scikit-learn
+joblib
