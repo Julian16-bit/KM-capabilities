@@ -6,7 +6,7 @@ sentence_transformers
 weaviate-client
 matplotlib
 keybert
-spacy==3.5.2
+spacy==3.4.0
 wordcloud
 scikit-learn
 joblib
