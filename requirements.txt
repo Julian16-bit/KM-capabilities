@@ -4,3 +4,10 @@ textdescriptives
 openai
 sentence_transformers
 weaviate-client
+matplotlib
+keybert
+spacy
+wordcloud
+scikit-learn
+joblib
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.4.0/en_core_web_sm-3.4.0.tar.gz
