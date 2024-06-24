@@ -8,12 +8,19 @@ import weaviate
 import json
 import spacy
 import joblib
+import subprocess
 import matplotlib.pyplot as plt
 from keybert import KeyBERT
 from sklearn.cluster import KMeans
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
 auth_config = weaviate.AuthApiKey(api_key="MutVi6yIYXH5xsoUlxhDH0O4GwO1aBCe1Jz0")
+
+try:
+  subprocess.run(['python', '-m', 'spacy', 'download', 'en_core_web_sm'], check=True)
+  print(f"Successfully downloaded")
+except subprocess.CalledProcessError as e:
+  print(f"Error downloading: {e}")
 
 client = weaviate.Client(
   url="https://digest-data-english-i0rn0tsj.weaviate.network",
