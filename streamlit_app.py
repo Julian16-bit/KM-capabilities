@@ -112,6 +112,7 @@ def check_conflicts(doc_pair):
         model="gpt-3.5-turbo-0125",
         messages=messages,
         tools=tools,
+        tool_choice="required",
         seed=123,
         temperature=0,
     )
