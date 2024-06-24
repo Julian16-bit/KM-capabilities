@@ -10,3 +10,4 @@ spacy==3.5.2
 wordcloud
 scikit-learn
 joblib
+spacy-streamlit
