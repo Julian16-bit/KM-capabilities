@@ -128,14 +128,14 @@ def label_conflicts(have_conflicts):
 
 def check_conflicts(doc_pair):
     # Step 1: send the conversation and available functions to the model
-    content = """ Is there certain conflict in the information, facts, or assumptions delivered between these two documents?
+    content = """ Is there certain conflict in the information, facts, or assumptions delivered between these two documents? If the contexts are from the different perspective of the same condition, they are NOT conflicted.
     Document 1:
     {}
 
     Document 2:
     {}
     """.format(doc_pair[0], doc_pair[1])
-    hint = "The different scenarios, terminologies, and phrasings are NOT conflicts. Be sensitive towards numbers. You must call the function with parameter that indicates if there is conflict."
+    hint = "The different wordings that conveying the same information are NOT considered conflicts. Contents cover different subjects are NOT considered conflicts. Be sensitive towards numbers."
     messages = [{"role": "user", "content": content}, {"role": "system", "content": hint}]
     tools = [
         {
@@ -189,7 +189,7 @@ def check_conflicts(doc_pair):
               Document 2:
               {}
               """.format(doc_pair[0], doc_pair[1])
-              hint = "The different scenarios, terminologies, and phrasings are not considered conflicts. Be sensitive towards numbers."
+              hint = "The different wordings that conveying the same information are NOT considered conflicts. Contents cover different subjects are NOT considered conflicts. Be sensitive towards numbers."
               completion = gpt.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -271,9 +271,9 @@ if st.button("Submit"):
             conflict = check_conflicts(pair)
             if conflict != None: 
                 section = {
-                    'texts': res[i],
+                    'document 1': res[i][0],
+                    'document 2': res[i][1],
                     'files': idx[i],
-                    'conflict': conflict,
                     'explanation': conflict
                 }
                 full_docs.append(section)
