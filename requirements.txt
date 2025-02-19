@@ -3,7 +3,7 @@ pandas
 textdescriptives
 openai
 sentence_transformers
-weaviate-client
+weaviate-client==3.*
 matplotlib
 keybert
 spacy
