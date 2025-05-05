@@ -14,7 +14,7 @@ from keybert import KeyBERT
 from sklearn.cluster import KMeans
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
-auth_config = weaviate.AuthApiKey(api_key="3am4djGqjqc4AvZbY8DMrCjpfUcWFyU9P9i8")
+auth_config = weaviate.AuthApiKey(api_key="TpeuDgfFvA5dTyol0zDIquJUWNmufgPE0snI")
 
 try:
   subprocess.run(['python', '-m', 'spacy', 'download', 'en_core_web_sm'], check=True)
@@ -23,7 +23,7 @@ except subprocess.CalledProcessError as e:
   print(f"Error downloading: {e}")
 
 client = weaviate.Client(
-  url="https://lkmdgtmr4o18tylpwxzuq.c0.us-east1.gcp.weaviate.cloud",
+  url="https://y2ps7g7erba9lwzslpaza.c0.us-west3.gcp.weaviate.cloud",
   auth_client_secret=auth_config
 )
 
