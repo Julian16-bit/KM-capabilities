@@ -15,7 +15,7 @@ from sklearn.cluster import KMeans
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import re
 
-auth_config = weaviate.AuthApiKey(api_key="UVZFZXdnR1pjTHZIUzBNY18wK0hnYm0xSmtsNXFLUmsxVjFOaDBkSm8vTFFIRWxrZzlGNWN4ckVycExrPV92MjAw")
+auth_config = weaviate.AuthApiKey(api_key="U1NQc2ZhSVFxTkJvTVl4VV9rNFAvYkJTZ2dCTUF4L1pCd0RGMDJMaWVLMCt4aE1CNnN6MGV6M3QwMkdZPV92MjAw")
 
 try:
   subprocess.run(['python', '-m', 'spacy', 'download', 'en_core_web_sm'], check=True)
@@ -24,7 +24,7 @@ except subprocess.CalledProcessError as e:
   print(f"Error downloading: {e}")
 
 client = weaviate.Client(
-  url="https://rhckow5tztfcscvxtsra.c0.us-west3.gcp.weaviate.cloud",
+  url="https://h8dlhv1cqscf7ajfg8bhbq.c0.us-west3.gcp.weaviate.cloud",
   auth_client_secret=auth_config
 )
 
@@ -122,7 +122,7 @@ def top_results(text):
 
   scores = reranker_model.predict(query_doc_pairs)
 
-  top_n = 5 ### Cap number of documents that are sent to LLM for RAG
+  top_n = 1 ### Cap number of documents that are sent to LLM for RAG
   scores_cp = scores.tolist()
   documents = [pair[1] for pair in query_doc_pairs]
   content = ""
