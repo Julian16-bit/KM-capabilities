@@ -14,7 +14,7 @@ from keybert import KeyBERT
 from sklearn.cluster import KMeans
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
-auth_config = weaviate.AuthApiKey(api_key="NVlTamdubHlwekVOSnhxdV9yTkd3WUdXTzVVN3Riam93UzRBR0lwVGVxTkFqMnEwaENZbE5penJpb09BPV92MjAw")
+auth_config = weaviate.AuthApiKey(api_key="bWtmdlJnWkxvSURxSnZ2Zl9qZUcyMHQzdHBIZ0tMeXp3WVlIeWdaSXdBcWNEU3I1RUxUQkpRbnhrMkxBPV92MjAw")
 
 try:
   subprocess.run(['python', '-m', 'spacy', 'download', 'en_core_web_sm'], check=True)
@@ -23,7 +23,7 @@ except subprocess.CalledProcessError as e:
   print(f"Error downloading: {e}")
 
 client = weaviate.Client(
-  url="https://nnvmdlmlsusljtzeyvyzmw.c0.us-west3.gcp.weaviate.cloud",
+  url="https://ttqcriosr6n00jmyqdnw.c0.us-west3.gcp.weaviate.cloud",
   auth_client_secret=auth_config
 )
 
@@ -79,7 +79,7 @@ def top_results(text):
   query_embedding = vect_model.encode(text)
   response = (
   client.query
-  .get("Digest2", ["content", "section_title", "doc_id", "section_chapter", "section_text"])
+  .get("Runbook", ["content", "section_title", "doc_id", "section_text"])
   .with_hybrid(query=text, vector=query_embedding)
   .with_additional(["score"])
   .with_limit(20)
@@ -87,18 +87,17 @@ def top_results(text):
   )
   
   results = []
-  for item in response['data']['Get']['Digest2']:
+  for item in response['data']['Get']['Runbook']:
     result = {
         'doc_id': item['doc_id'],
         'section_title': item['section_title'],
-        'section_chapter': item['section_chapter'],
         'score': item['_additional']['score'],
         'content': item['content'],
         'section_text': item['section_text']
     }
     results.append(result)
 
-  query_doc_pairs = [[text, res["content"]] for res in response["data"]["Get"]["Digest2"]]
+  query_doc_pairs = [[text, res["content"]] for res in response["data"]["Get"]["Runbook"]]
 
   scores = reranker_model.predict(query_doc_pairs)
 
@@ -119,7 +118,7 @@ def top_results(text):
   content_set = set(content_display)
   doc_display = [docs for docs in results if docs['content'].strip() in content_set]
   df_similar = pd.DataFrame.from_dict(doc_display, orient='columns')
-  df_similar = df_similar[['doc_id', 'section_chapter', 'section_title', 'score', 'content']]
+  df_similar = df_similar[['doc_id', 'section_title', 'score', 'content']]
 
   return df_similar, results
 
