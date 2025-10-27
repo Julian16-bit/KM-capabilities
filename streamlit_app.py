@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from keybert import KeyBERT
 from sklearn.cluster import KMeans
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+import re
 
 auth_config = weaviate.AuthApiKey(api_key="bWtmdlJnWkxvSURxSnZ2Zl9qZUcyMHQzdHBIZ0tMeXp3WVlIeWdaSXdBcWNEU3I1RUxUQkpRbnhrMkxBPV92MjAw")
 
@@ -75,7 +76,27 @@ for label in range(nb_clusters):
       else:
         counts[keywords.index(cluster_keywords[idx])] += cluster_keywords_counts[idx]
 
+def clean_text_for_query(text: str) -> str:
+    """Sanitize text before sending to Weaviate hybrid search."""
+    if not isinstance(text, str):
+        text = str(text)
+
+    # Remove control characters
+    text = re.sub(r'[\x00-\x1F\x7F]', ' ', text)
+
+    # Escape backslashes
+    text = text.replace("\\", "\\\\")
+    
+    # Escape double quotes
+    text = text.replace('"', '\\"')
+    
+    # Normalize spaces
+    text = re.sub(r'\s+', ' ', text).strip()
+
+    return text
+
 def top_results(text):
+  text = clean_text_for_query(text)
   query_embedding = vect_model.encode(text)
   response = (
   client.query
